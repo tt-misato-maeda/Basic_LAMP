@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  apache:
+    build: 
+      context: ./apache
+      dockerfile: Dockerfile
+    image: httpd:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./www/:/usr/local/apache2/htdocs/
+      - ./apache/my.conf:/usr/local/apache2/conf/extra/my.conf
+    depends_on:
+      - php
+  php:
+    image: php:7.4-fpm
+    volumes:
+      - ./www/:/usr/local/apache2/htdocs/
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: college_db
+    volumes:
+      - ./my.conf:/etc/mysql/conf.d/my.conf
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
